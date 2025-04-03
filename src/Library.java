@@ -1,3 +1,7 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
+
 public class Library {
     private Book[] books = new Book[100];
     private int bookCount;
@@ -32,20 +36,69 @@ public class Library {
         return null;
     }
 
-    public void checkOutBook(String studentId, String isbn) {
-        // 1. Get book
-        // 2. Get student
-        // 3. Make sure book is available
-        // 4. Tell book to check itself out
-        // 5. Tell student to record the checkout
+    /**
+     * Checks out a book for a student with the default number of days (14).
+     */
+    public void checkOutBook(int studentId, int isbn) {
+        Book book = findBookByIsbn(isbn);
+        if (book != null && !book.isCheckedOut() && !book.isLost()) {
+            book.setCheckedOut(true);
+            book.setStudentId(studentId);
+            findStudentById(studentId).borrowBook(book);
+            System.out.println("The book \"" + book.getTitle() + "\" has been checked out successfully. \nIt should be returned by " + todayPlus(14) + ".");
+        } else if (book.isCheckedOut()) {
+            System.out.println("Book is already checked out by " + findStudentById(studentId).getName() + ".");
+        } else if (book.isLost()) {
+            System.out.println("Book is marked as lost.");
+        } else {
+            System.out.println("Book not found.");
+        }
     }
 
-    public void returnBook(String studentId, String isbn) {
-        // 1. Get book
-        // 2. Get student
-        // 3. Make sure book is checked out
-        // 4. Tell book to check itself in
-        // 5. Tell student to remove the book from its currently checked out list
+    /**
+     * Checks out a book for a specified number of days.
+     */
+    public void checkOutBook(int studentId, int isbn, int days) {
+        Book book = findBookByIsbn(isbn);
+        if (book != null && !book.isCheckedOut() && !book.isLost()) {
+            book.setCheckedOut(true);
+            book.setStudentId(studentId);
+            System.out.println("The book \"" + book.getTitle() + "\" has been checked out successfully. \nIt should be returned by " + todayPlus(days) + ".");
+        } else if (book.isCheckedOut()) {
+            System.out.println("Book is already checked out by " + findStudentById(studentId).getName() + ".");
+        } else if (book.isLost()) {
+            System.out.println("Book is marked as lost.");
+        } else {
+            System.out.println("Book not found.");
+        }
+    }
+
+    public void returnBook(int isbn) {
+        Book book;
+        while (true) {
+            book = findBookByIsbn(isbn);
+            if (book != null) {
+                if (book.isCheckedOut()) {
+                    book.setCheckedOut(false);
+                    book.setStudentId(0);
+                    System.out.println("The book \"" + book.getTitle() + "\" has been returned successfully.");
+                    break;
+                } else {
+                    System.out.println("This book was not checked out.");
+                    break;
+                }
+            } else {
+                System.out.println("Book not found. Please input a valid ISBN or type -1 to cancel:");
+                Scanner scanner = new Scanner(System.in);
+                System.out.print("Enter ISBN: ");
+                isbn = scanner.nextInt();
+                if (isbn == -1) {
+                    System.out.println("Operation canceled.");
+                    break;
+                }
+            scanner.close();
+            }
+        }
     }
 
     public void addStudent(String name, int id) {
@@ -59,8 +112,8 @@ public class Library {
     public void removeStudent(int id) {
         for (int i = 0; i < studentCount; i++) {
             if (students[i].getId() == id) {
-                students[i] = students[--studentCount]; // Replace with the last student
-                students[studentCount] = null; // Clear the last position
+                students[i] = students[--studentCount];
+                students[studentCount] = null;
                 return;
             }
         }
@@ -74,5 +127,12 @@ public class Library {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the current date plus a given number of days as a String in the format "yyyy-MM-dd".
+     */
+    public static String todayPlus(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

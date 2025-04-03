@@ -50,4 +50,17 @@ public class Printer {
     public String input() {
         return in.nextLine();
     }
+
+    /**
+     * Takes a user input from the console and returns it as an integer.
+     */
+    public int inputInt() {
+        String input = in.nextLine();
+        try {
+            return Integer.parseInt(input);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
+            return inputInt();
+        }
+    }
 }

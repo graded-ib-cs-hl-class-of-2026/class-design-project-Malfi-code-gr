@@ -9,16 +9,8 @@ public class Student {
         this.id = id;
     }
 
-    public borrowBook(int isbn) {
-        Book book = findBookByIsbn(isbn);
-        if (book != null && !book.isCheckedOut()) {
-            book.setCheckedOut(true);
-            book.setStudentId(this.id);
-            checkedOutBooks[checkedOutCount++] = book;
-            System.out.println("Book with ISBN " + book.getIsbn() + " checked out successfully.");
-        } else {
-            System.out.println("Book is not available for checkout.");
-        }
+    public void borrowBook(Book book) {
+        checkedOutBooks[checkedOutCount++] = book;
     }
 
     // Getters
