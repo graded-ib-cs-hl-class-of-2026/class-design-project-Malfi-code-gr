@@ -1,0 +1,65 @@
+{
+    "library": {
+        "books": [
+            {
+                "title": "To Kill a Mockingbird",
+                "author": "Harper Lee",
+                "ISBN": "9780061120084"
+            },
+            {
+                "title": "1984",
+                "author": "George Orwell",
+                "ISBN": "9780451524935"
+            },
+            {
+                "title": "The Great Gatsby",
+                "author": "F. Scott Fitzgerald",
+                "ISBN": "9780743273565"
+            }
+        ],
+        "students": [
+            {
+                "name": "Alice Johnson",
+                "ID": 321456,
+                "checkedOutBooks": [
+                    {
+                        "title": "To Kill a Mockingbird",
+                        "checkOutDate": "2025-03-07",
+                        "dueDate": "2025-04-07",
+                        "returnedDate": null
+                    },
+                    {
+                        "title": "1984",
+                        "checkOutDate": "2025-02-28",
+                        "dueDate": "2025-03-28",
+                        "returnedDate": "2025-03-29"
+                    },
+                    {
+                        "title": "The Great Gatsby",
+                        "checkOutDate": "2025-03-01",
+                        "dueDate": "2025-03-31",
+                        "returnedDate": null
+                    }
+                ]
+            },
+            {
+                "name": "Bob Smith",
+                "ID": 321789,
+                "checkedOutBooks": [
+                    {
+                        "title": "1984",
+                        "checkOutDate": "2025-01-05",
+                        "dueDate": "2025-02-05",
+                        "returnedDate": "2025-02-05"
+                    },
+                    {
+                        "title": "The Great Gatsby",
+                        "checkOutDate": "2025-01-10",
+                        "dueDate": "2025-02-10",
+                        "returnedDate": "2025-02-10"
+                    }
+                ]
+            }
+        ]
+    }
+}
