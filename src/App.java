@@ -3,8 +3,14 @@ public class App {
     private Printer printer = new Printer();
 
     public void start() {
-        myLibrary = new Library();
+        myLibrary = readLibraryData("library.json");
         displayMenu();
+    }
+
+    public Library readLibraryData(String filename) {
+        Library library = new Library();
+        // JSON parsing logic to read library data from the file
+        return library;
     }
 
     public void displayMenu() {
