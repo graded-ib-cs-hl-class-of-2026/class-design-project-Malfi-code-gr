@@ -1,22 +1,19 @@
 import java.io.*;
-import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.script.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 
 public class App {
     private Library myLibrary;
     private Printer printer = new Printer();
 
     // ANSI color codes
-    private static final String RESET = "\u001B[0m";
-    private static final String WHITE = "\u001B[37m";
-    private static final String BLACK = "\u001B[30m";
     private static final String RED = "\u001B[31m";
     private static final String GREEN = "\u001B[32m";
-    private static final String YELLOW = "\u001B[33m";
-    private static final String BLUE = "\u001B[34m";
     private static final String MAGENTA = "\u001B[35m";
     private static final String CYAN = "\u001B[36m";
     private static final String LIGHT_BLUE = "\u001B[94m";
@@ -70,19 +67,40 @@ public class App {
                 String studentName = studentMatcher.group(1);
                 int studentId = Integer.parseInt(studentMatcher.group(2));
                 String checkedOutBooksContent = studentMatcher.group(3);
-    
+
                 library.addStudent(studentName, studentId);
                 Student student = library.findStudentById(studentId);
-    
-                Pattern titlePattern = Pattern.compile("\"title\"\\s*:\\s*\"([^\"]+)\"");
-                Matcher titleMatcher = titlePattern.matcher(checkedOutBooksContent);
-                while (titleMatcher.find()) {
-                    String bookTitle = titleMatcher.group(1);
-                    Book book = library.findBookByTitle(bookTitle);
+                String booksBlock = studentMatcher.group(3);
+
+                // captures title, checkout, due, returned (or null)
+                Pattern recordPattern = Pattern.compile(
+                    "\\{\\s*\"title\"\\s*:\\s*\"([^\"]+)\"\\s*," +
+                    "\\s*\"checkOutDate\"\\s*:\\s*\"(\\d{4}-\\d{2}-\\d{2})\"\\s*," +
+                    "\\s*\"dueDate\"\\s*:\\s*\"(\\d{4}-\\d{2}-\\d{2})\"\\s*," +
+                    "\\s*\"returnedDate\"\\s*:\\s*(?:\"(\\d{4}-\\d{2}-\\d{2})\"|(null))" +
+                    "\\s*\\}",
+                    Pattern.DOTALL
+                );
+
+                Matcher recM = recordPattern.matcher(booksBlock);
+                while (recM.find()) {
+                    String title = recM.group(1);
+                    LocalDate checkout = LocalDate.parse(recM.group(2));
+                    LocalDate due = LocalDate.parse(recM.group(3));
+                    String retString = recM.group(4);
+                
+                    LocalDate returned;
+                    if (retString != null) {
+                        returned = LocalDate.parse(retString);
+                    } else {
+                        returned = null;
+                    }
+                
+                    Book book = library.findBookByTitle(title);
                     if (book != null) {
-                        book.setCheckedOut(true);
+                        book.setCheckedOut(returned == null);
                         book.setStudentId(studentId);
-                        student.borrowBook(book);
+                        student.addLoanRecord(book, checkout, due, returned);
                     }
                 }
             }
@@ -115,7 +133,8 @@ public class App {
         printer.output("│[7] Remove Book                                    │");
         printer.output("│[8] Add Student                                    │");
         printer.output("│[9] Remove Student                                 │");
-        printer.output("│[10] Exit The Library®                             │");
+        printer.output("│[10] View Student Records                          │");
+        printer.output("│[11] Exit The Library®                             │");
         printer.output("╰───────────────────────────────────────────────────╯");
 
         int choice = printer.inputInt();
@@ -324,7 +343,6 @@ public class App {
         } else if (choice == 6) { // Add Book
             boolean cancelAdd = false;
             while (!cancelAdd) {
-                // 1) TITLE
                 String bookTitle;
                 while (true) {
                     printer.output("Enter book title (or type -1 to cancel):");
@@ -335,13 +353,12 @@ public class App {
                         break;
                     }
                     if (!bookTitle.isEmpty()) {
-                        break;              // valid title → leave title loop
+                        break;
                     }
                     printer.output("Invalid input. Title cannot be empty. Please try again.");
                 }
                 if (cancelAdd) break;
         
-                // 2) AUTHOR
                 String bookAuthor;
                 while (true) {
                     printer.output("Enter book author (or type -1 to cancel):");
@@ -352,13 +369,12 @@ public class App {
                         break;
                     }
                     if (!bookAuthor.isEmpty()) {
-                        break;              // valid author → leave author loop
+                        break;
                     }
                     printer.output("Invalid input. Author cannot be empty. Please try again.");
                 }
                 if (cancelAdd) break;
-        
-                // 3) ISBN
+
                 long bookIsbn;
                 while (true) {
                     printer.output("Enter book ISBN-13 (13 digits without dashes, or type -1 to cancel):");
@@ -371,9 +387,8 @@ public class App {
                     String s = String.valueOf(bookIsbn);
                     if (s.length() != 13) {
                         printer.output("Invalid input. ISBN must be a 13-digit number without dashes. Please try again.");
-                        continue;           // ask ISBN again
+                        continue;
                     }
-                    // check for duplicate
                     boolean exists = false;
                     for (int i = 0; i < myLibrary.getBookCount(); i++) {
                         if (myLibrary.getBooks()[i].getIsbn() == bookIsbn) {
@@ -383,16 +398,15 @@ public class App {
                     }
                     if (exists) {
                         printer.output("A book with this ISBN already exists. Please enter a different ISBN.");
-                        continue;           // ask ISBN again
+                        continue;
                     }
-                    break;                  // valid, unique ISBN → leave ISBN loop
+                    break;
                 }
                 if (cancelAdd) break;
-        
-                // 4) ADD IT
+
                 myLibrary.addBook(bookTitle, bookAuthor, bookIsbn);
                 printer.output("Book \"" + bookTitle + "\" by " + bookAuthor + " has been added successfully.");
-                break;  // done with add‐book process
+                break;
             }
         }
         else if (choice == 7) { // Remove Book
@@ -429,7 +443,38 @@ public class App {
                 }
             }
         } else if (choice == 9) { // Remove Student
-        } else if (choice == 10) { // Exit
+            while (true) {
+                printer.output("Enter student ID of the student you'd like to remove (or -1 to cancel):");
+                int studentId = printer.inputInt();
+                if (studentId == -1) {
+                    printer.output("Returning to the main menu.");
+                    break;
+                }
+                Student student = myLibrary.findStudentById(studentId);
+                if (student != null) {
+                    myLibrary.removeStudent(studentId);
+                    printer.output("The student " + student.getName() + " has been removed successfully.");
+                    break;
+                } else {
+                    printer.output("Student not found. Please try again or type -1 to cancel.");
+                }
+            }
+        } else if (choice == 10) { // View Student Records
+            for (int i = 0; i < myLibrary.getStudentCount(); i++) {
+                Student student = myLibrary.getStudents()[i];
+                printer.output("Student ID: " + student.getId() + ", Name: " + student.getName() +
+                ", Loan Count: " + student.getLoanCount());
+                for (int j = 0; j < student.getLoanCount(); j++) {
+                    LoanRecord record = student.getLoanRecords()[j];
+                    if (record != null) {
+                        printer.output("Book Title: " + record.getBook().getTitle() +
+                        ", Check Out Date: " + record.getCheckOutDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
+                        ", Due Date: " + record.getDueDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) +
+                        ", Returned Date: " + (record.getReturnedDate() != null ? record.getReturnedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "Not returned"));
+                    }
+                }
+            }
+        } else if (choice == 11) { // Exit
             printer.output("Would you like to save? (Y/N)");
             while (true) {
                 printer.output("Would you like to save? (Y/N or -1 to cancel):");
