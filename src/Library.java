@@ -56,7 +56,7 @@ public class Library {
         if (book != null && !book.isCheckedOut() && !book.isLost()) {
             book.setCheckedOut(true);
             book.setStudentId(studentId);
-            findStudentById(studentId).borrowBook(book);
+            findStudentById(studentId).borrowBook(book, 14);
             System.out.println(CYAN + "The book \"" + book.getTitle() + "\" has been checked out successfully by " + findStudentById(studentId).getName() + ". \nIt should be returned by " + todayPlus(14) + ".");
         } else if (book.isCheckedOut()) {
             System.out.println(CYAN + "Book is already checked out by " + findStudentById(studentId).getName() + ".");
