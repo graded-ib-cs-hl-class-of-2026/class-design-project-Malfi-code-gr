@@ -322,54 +322,80 @@ public class App {
             }
             printer.output("-=-=-=-=-=-=-=-=-=-=-=-=-");
         } else if (choice == 6) { // Add Book
-            while (true) {
-                printer.output("Enter book title (or type -1 to cancel):");
-                String bookTitle = printer.input().trim();
-                if (bookTitle.equals("-1")) {
-                    printer.output("Returning to the main menu.");
-                    break;
-                } else if (bookTitle.isEmpty()) {
-                    printer.output("Invalid input. Title cannot be empty. Please try again.");
-                    continue;
-                }
-
-                printer.output("Enter book author (or type -1 to cancel):");
-                String bookAuthor = printer.input().trim();
-                if (bookAuthor.equals("-1")) {
-                    printer.output("Returning to the main menu.");
-                    break;
-                } else if (bookAuthor.isEmpty()) {
-                    printer.output("Invalid input. Author cannot be empty. Please try again.");
-                    continue;
-                }
-
-                printer.output("Enter book ISBN-13 (13 digits without dashes, or type -1 to cancel):");
-                long bookIsbn = printer.inputLong();
-                if (bookIsbn == -1) {
-                    printer.output("Returning to the main menu.");
-                    break;
-                } else if (String.valueOf(bookIsbn).length() != 13) {
-                    printer.output("Invalid input. ISBN must be a 13-digit number without dashes. Please try again.");
-                    continue;
-                }
-
-                boolean isbnExists = false;
-                for (int i = 0; i < myLibrary.getBookCount(); i++) {
-                    if (myLibrary.getBooks()[i].getIsbn() == bookIsbn) {
-                        isbnExists = true;
+            boolean cancelAdd = false;
+            while (!cancelAdd) {
+                // 1) TITLE
+                String bookTitle;
+                while (true) {
+                    printer.output("Enter book title (or type -1 to cancel):");
+                    bookTitle = printer.input().trim();
+                    if (bookTitle.equals("-1")) {
+                        printer.output("Returning to the main menu.");
+                        cancelAdd = true;
                         break;
                     }
+                    if (!bookTitle.isEmpty()) {
+                        break;              // valid title → leave title loop
+                    }
+                    printer.output("Invalid input. Title cannot be empty. Please try again.");
                 }
-
-                if (isbnExists) {
-                    printer.output("A book with this ISBN already exists in the library. Please try again.");
-                } else {
-                    myLibrary.addBook(bookTitle, bookAuthor, bookIsbn);
-                    printer.output("Book \"" + bookTitle + "\" by " + bookAuthor + " has been added successfully.");
-                    break;
+                if (cancelAdd) break;
+        
+                // 2) AUTHOR
+                String bookAuthor;
+                while (true) {
+                    printer.output("Enter book author (or type -1 to cancel):");
+                    bookAuthor = printer.input().trim();
+                    if (bookAuthor.equals("-1")) {
+                        printer.output("Returning to the main menu.");
+                        cancelAdd = true;
+                        break;
+                    }
+                    if (!bookAuthor.isEmpty()) {
+                        break;              // valid author → leave author loop
+                    }
+                    printer.output("Invalid input. Author cannot be empty. Please try again.");
                 }
+                if (cancelAdd) break;
+        
+                // 3) ISBN
+                long bookIsbn;
+                while (true) {
+                    printer.output("Enter book ISBN-13 (13 digits without dashes, or type -1 to cancel):");
+                    bookIsbn = printer.inputLong();
+                    if (bookIsbn == -1) {
+                        printer.output("Returning to the main menu.");
+                        cancelAdd = true;
+                        break;
+                    }
+                    String s = String.valueOf(bookIsbn);
+                    if (s.length() != 13) {
+                        printer.output("Invalid input. ISBN must be a 13-digit number without dashes. Please try again.");
+                        continue;           // ask ISBN again
+                    }
+                    // check for duplicate
+                    boolean exists = false;
+                    for (int i = 0; i < myLibrary.getBookCount(); i++) {
+                        if (myLibrary.getBooks()[i].getIsbn() == bookIsbn) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (exists) {
+                        printer.output("A book with this ISBN already exists. Please enter a different ISBN.");
+                        continue;           // ask ISBN again
+                    }
+                    break;                  // valid, unique ISBN → leave ISBN loop
+                }
+                if (cancelAdd) break;
+        
+                // 4) ADD IT
+                myLibrary.addBook(bookTitle, bookAuthor, bookIsbn);
+                printer.output("Book \"" + bookTitle + "\" by " + bookAuthor + " has been added successfully.");
+                break;  // done with add‐book process
             }
-        } else if (choice == 7) { // Remove Book
+        }
+        else if (choice == 7) { // Remove Book
             printer.output("Enter ISBN of the book you'd like to remove (or -1 to cancel):");
             long isbn = printer.inputLong();
             if (isbn == -1) {
