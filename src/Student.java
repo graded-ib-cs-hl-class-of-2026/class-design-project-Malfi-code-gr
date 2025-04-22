@@ -7,6 +7,8 @@ public class Student {
     public Student(String name, int id) {
         this.name = name;
         this.id = id;
+        this.checkedOutBooks = new Book[100];
+        this.checkedOutCount = 0;
     }
 
     public void borrowBook(Book book) {

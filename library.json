@@ -12,9 +12,14 @@
                 "ISBN": "9780451524935"
             },
             {
-                "title": "The Great Gatsby",
+                "title": "Sushant's Balls",
                 "author": "F. Scott Fitzgerald",
                 "ISBN": "9780743273565"
+            },
+            {
+                "title": "The Things They Carried",
+                "author": "Tim O'Brien",
+                "ISBN": "9780618706419"
             }
         ],
         "students": [

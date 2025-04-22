@@ -8,7 +8,9 @@ public class Library {
     private Student[] students = new Student[100];
     private int studentCount;
 
-    public void addBook(String title, String author, int isbn) {
+    private static final String CYAN = "\u001B[36m";
+
+    public void addBook(String title, String author, long isbn) {
         if (bookCount < books.length) {
             books[bookCount++] = new Book(title, author, isbn);
         } else {
@@ -16,7 +18,7 @@ public class Library {
         }
     }
 
-    public void removeBook(int isbn) {
+    public void removeBook(long isbn) {
         for (int i = 0; i < bookCount; i++) {
             if (books[i].getIsbn() == isbn) {
                 books[i] = books[--bookCount]; // Replace with the last book
@@ -27,7 +29,7 @@ public class Library {
         System.out.println("Book not found.");
     }
 
-    public Book findBookByIsbn(int isbn) {
+    public Book findBookByIsbn(long isbn) {
         for (int i = 0; i < bookCount; i++) {
             if (books[i].getIsbn() == isbn) {
                 return books[i];
@@ -36,68 +38,48 @@ public class Library {
         return null;
     }
 
+    public Book findBookByTitle(String title) {
+        for (int i = 0; i < bookCount; i++) {
+            if (books[i].getTitle().equalsIgnoreCase(title)) {
+                return books[i];
+            }
+        }
+        return null;
+    }    
+    
+
     /**
      * Checks out a book for a student with the default number of days (14).
      */
-    public void checkOutBook(int studentId, int isbn) {
+    public void checkOutBook(int studentId, long isbn) {
         Book book = findBookByIsbn(isbn);
         if (book != null && !book.isCheckedOut() && !book.isLost()) {
             book.setCheckedOut(true);
             book.setStudentId(studentId);
             findStudentById(studentId).borrowBook(book);
-            System.out.println("The book \"" + book.getTitle() + "\" has been checked out successfully. \nIt should be returned by " + todayPlus(14) + ".");
+            System.out.println(CYAN + "The book \"" + book.getTitle() + "\" has been checked out successfully by " + findStudentById(studentId).getName() + ". \nIt should be returned by " + todayPlus(14) + ".");
         } else if (book.isCheckedOut()) {
-            System.out.println("Book is already checked out by " + findStudentById(studentId).getName() + ".");
+            System.out.println(CYAN + "Book is already checked out by " + findStudentById(studentId).getName() + ".");
         } else if (book.isLost()) {
-            System.out.println("Book is marked as lost.");
+            System.out.println(CYAN + "Book is marked as lost.");
         } else {
-            System.out.println("Book not found.");
+            System.out.println(CYAN + "Book not found.");
         }
     }
 
     /**
      * Checks out a book for a specified number of days.
      */
-    public void checkOutBook(int studentId, int isbn, int days) {
+    public void checkOutBook(int studentId, long isbn, int days) {
         Book book = findBookByIsbn(isbn);
         if (book != null && !book.isCheckedOut() && !book.isLost()) {
             book.setCheckedOut(true);
             book.setStudentId(studentId);
-            System.out.println("The book \"" + book.getTitle() + "\" has been checked out successfully. \nIt should be returned by " + todayPlus(days) + ".");
-        } else if (book.isCheckedOut()) {
-            System.out.println("Book is already checked out by " + findStudentById(studentId).getName() + ".");
+            System.out.println(CYAN + "The book \"" + book.getTitle() + "\" has been checked out successfully. \nIt should be returned by " + todayPlus(days) + ".");
         } else if (book.isLost()) {
             System.out.println("Book is marked as lost.");
         } else {
             System.out.println("Book not found.");
-        }
-    }
-
-    public void returnBook(int isbn) {
-        Book book;
-        while (true) {
-            book = findBookByIsbn(isbn);
-            if (book != null) {
-                if (book.isCheckedOut()) {
-                    book.setCheckedOut(false);
-                    book.setStudentId(0);
-                    System.out.println("The book \"" + book.getTitle() + "\" has been returned successfully.");
-                    break;
-                } else {
-                    System.out.println("This book was not checked out.");
-                    break;
-                }
-            } else {
-                System.out.println("Book not found. Please input a valid ISBN or type -1 to cancel:");
-                Scanner scanner = new Scanner(System.in);
-                System.out.print("Enter ISBN: ");
-                isbn = scanner.nextInt();
-                if (isbn == -1) {
-                    System.out.println("Operation canceled.");
-                    break;
-                }
-            scanner.close();
-            }
         }
     }
 
@@ -127,6 +109,23 @@ public class Library {
             }
         }
         return null;
+    }
+
+    // getters
+    public Book[] getBooks() {
+        return books;
+    }
+
+    public int getBookCount() {
+        return bookCount;
+    }
+
+    public Student[] getStudents() {
+        return students;
+    }
+
+    public int getStudentCount() {
+        return studentCount;
     }
 
     /**
