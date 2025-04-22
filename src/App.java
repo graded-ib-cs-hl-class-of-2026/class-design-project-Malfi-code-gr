@@ -127,15 +127,14 @@ public class App {
         printer.output("\n╭───────────────────────────────────────────────────╮");
         printer.output("│[1] Check Out Book                                 │");
         printer.output("│[2] Return Book                                    │");
-        printer.output("│[3] Search Book by ISBN                            │");
-        printer.output("│[4] Search Book by Name                            │");
-        printer.output("│[5] List All Books                                 │");
-        printer.output("│[6] Add Book                                       │");
-        printer.output("│[7] Remove Book                                    │");
-        printer.output("│[8] Add Student                                    │");
-        printer.output("│[9] Remove Student                                 │");
-        printer.output("│[10] View Student Records                          │");
-        printer.output("│[11] Exit The Library®                             │");
+        printer.output("│[3] Search Book                                    │");
+        printer.output("│[4] List All Books                                 │");
+        printer.output("│[5] Add Book                                       │");
+        printer.output("│[6] Remove Book                                    │");
+        printer.output("│[7] Add Student                                    │");
+        printer.output("│[8] Remove Student                                 │");
+        printer.output("│[9] View Student Records                           │");
+        printer.output("│[10] Exit The Library®                             │");
         printer.output("╰───────────────────────────────────────────────────╯");
 
         int choice = printer.inputInt();
@@ -214,112 +213,85 @@ public class App {
                     }
                 }
             }
-        } else if (choice == 3) { // Search Book by ISBN
-            boolean cancelSearch = false;
-            while (!cancelSearch) {
-                printer.output("Enter the ISBN of the book you'd like to find (or type -1 to cancel):");
-                long isbn = printer.inputLong();
-                if (isbn == -1) {
+        } else if (choice == 3) { // Search Book
+            while (true) {
+                printer.output("Search by: [1] ISBN, [2] Name (or -1 to cancel):");
+                int searchType = printer.inputInt();
+                if (searchType == -1) {
                     printer.output("Returning to the main menu.");
-                    break;
+                    break; // exit choice 3
                 }
-                Book book = myLibrary.findBookByIsbn(isbn);
-                if (book != null) {
-                    if (book.isCheckedOut()) {
-                        printer.output("The book \"" + book.getTitle() + "\" is currently checked out by " +
-                                        myLibrary.findStudentById(book.getStudentId()).getName() + ".");
-                    } else if (book.isLost()) {
-                        printer.output("The book \"" + book.getTitle() + "\" is marked as lost.");
-                    } else {
-                        printer.output("The book \"" + book.getTitle() + "\" is available. Would you like to check it out? (Y/N)");
-                        String response = printer.input();
-                        if (response.equalsIgnoreCase("Y")) {
-                            boolean cancelThisCheckout = false;
-                            int studentId;
-                            while (true) {
-                                printer.output("Enter student ID (or -1 to cancel):");
-                                studentId = printer.inputInt();
-                                if (studentId == -1) {
-                                    printer.output("Returning to the main menu.");
-                                    cancelThisCheckout = true;
-                                    break;
-                                }
-                                if (myLibrary.findStudentById(studentId) != null) {
-                                    break;
-                                } else {
-                                    printer.output("Student not found. Please try again or press -1 to go back.");
-                                }
-                            }
-
-                            if (cancelThisCheckout) {
-                                cancelSearch = true;
-                                break;
-                            }
-                            int days;
-                            while (true) {
-                                printer.output("Please enter the number of days before returning or press Enter for default (14)");
-                                String line = printer.input();
-                                if (line.isEmpty()) {
-                                    days = 14;
-                                    break;
-                                }
-                                try {
-                                    days = Integer.parseInt(line);
-                                    if (days > 0) {
-                                        break;
-                                    }
-                                    printer.output("Please enter a positive number or just hit Enter.");
-                                } catch (NumberFormatException e) {
-                                    printer.output("Invalid input. Please enter a positive number or just hit Enter.");
-                                }
-                            }
-
-                            // now you have a guaranteed positive `days` (or 14), so:
-                            myLibrary.checkOutBook(studentId, isbn, days);
-                            break;
-                        } else {
+                if (searchType == 1) { // ISBN
+                    while (true) {
+                        printer.output("Enter the ISBN of the book you'd like to find (or type -1 to cancel):");
+                        long isbn = printer.inputLong();
+                        if (isbn == -1) {
                             printer.output("Returning to the main menu.");
                             break;
                         }
-                    }
-                } else {
-                    printer.output("Book not found. Please try again or type -1 to cancel.");
-                }
-            }
-        } else if (choice == 4) { // Search Book by Name
-            while (true) {
-                printer.output("Enter the name of the book you'd like to find (or type -1 to cancel):");
-                String bookName = printer.input();
-                if (bookName.equals("-1")) {
-                    printer.output("Returning to the main menu.");
-                    break;
-                } else {
-                    Book book = myLibrary.findBookByTitle(bookName);
-                    if (book == null) {
-                        printer.output("No books found with the name \"" + bookName + "\".");
-                        // ask for input again
-                    } else {
-                        if (book.isCheckedOut()) {
-                            printer.output("Title: " + RED + book.getTitle() + 
-                            CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
-                            CYAN + ", ISBN: " + GREEN + book.getIsbn() +
-                            CYAN + ", Checked out by: " + YELLOW + myLibrary.findStudentById(book.getStudentId()).getName());
-                        } else if (book.isLost()) {
-                            printer.output("Title: " + RED + book.getTitle() + 
-                            CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
-                            CYAN + ", ISBN: " + GREEN + book.getIsbn() + 
-                            CYAN + ", Status: " + RED + "Lost");
-                        } else {
-                            printer.output("Title: " + RED + book.getTitle() + 
-                            CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
-                            CYAN + ", ISBN: " + GREEN + book.getIsbn() + 
-                            CYAN + ", Status: " + GREEN + "Available");
+                        Book book = myLibrary.findBookByIsbn(isbn);
+                        if (book == null) {
+                            printer.output("Book not found. Please try again or type -1 to cancel.");
+                            continue;
                         }
-                        break;
+                        if (book.isCheckedOut()) {
+                            printer.output("Title: " + RED + book.getTitle() +
+                                           CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
+                                           CYAN + ", ISBN: " + GREEN + book.getIsbn() +
+                                           CYAN + ", Checked out by: " + YELLOW +
+                                           myLibrary.findStudentById(book.getStudentId()).getName());
+                        } else if (book.isLost()) {
+                            printer.output("Title: " + RED + book.getTitle() +
+                                           CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
+                                           CYAN + ", ISBN: " + GREEN + book.getIsbn() +
+                                           CYAN + ", Status: " + RED + "Lost");
+                        } else {
+                            printer.output("Title: " + RED + book.getTitle() +
+                                           CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
+                                           CYAN + ", ISBN: " + GREEN + book.getIsbn() +
+                                           CYAN + ", Status: " + GREEN + "Available");
+                        }
+                        break; // Name flow
                     }
+                    break; // searchType loop
                 }
+                if (searchType == 2) { // Name
+                    while (true) {
+                        printer.output("Enter the name of the book you'd like to find (or type -1 to cancel):");
+                        String bookName = printer.input();
+                        if (bookName.equals("-1")) {
+                            printer.output("Returning to the main menu.");
+                            break;
+                        }
+                        Book book = myLibrary.findBookByTitle(bookName);
+                        if (book == null) {
+                            printer.output("No books found with the name \"" + bookName + "\".");
+                            continue;
+                        }
+                        if (book.isCheckedOut()) {
+                            printer.output("Title: " + RED + book.getTitle() +
+                                           CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
+                                           CYAN + ", ISBN: " + GREEN + book.getIsbn() +
+                                           CYAN + ", Checked out by: " + YELLOW +
+                                           myLibrary.findStudentById(book.getStudentId()).getName());
+                        } else if (book.isLost()) {
+                            printer.output("Title: " + RED + book.getTitle() +
+                                           CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
+                                           CYAN + ", ISBN: " + GREEN + book.getIsbn() +
+                                           CYAN + ", Status: " + RED + "Lost");
+                        } else {
+                            printer.output("Title: " + RED + book.getTitle() +
+                                           CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
+                                           CYAN + ", ISBN: " + GREEN + book.getIsbn() +
+                                           CYAN + ", Status: " + GREEN + "Available");
+                        }
+                        break; // Name flow
+                    }
+                    break; // searchType loop
+                }
+                printer.output("Invalid input. Please enter 1, 2, or -1 to cancel.");
             }
-        } else if (choice == 5) { // List All Books
+        } else if (choice == 4) { // List All Books
             printer.output("List of all books in the library:\n-=-=-=-=-=-=-=-=-=-=-=-=-");
             for (int i = 0; i < myLibrary.getBookCount(); i++) {
                 Book book = myLibrary.getBooks()[i];
@@ -341,7 +313,7 @@ public class App {
                 }
             }
             printer.output("-=-=-=-=-=-=-=-=-=-=-=-=-");
-        } else if (choice == 6) { // Add Book
+        } else if (choice == 5) { // Add Book
             boolean cancelAdd = false;
             while (!cancelAdd) {
                 String bookTitle;
@@ -410,7 +382,7 @@ public class App {
                 break;
             }
         }
-        else if (choice == 7) { // Remove Book
+        else if (choice == 6) { // Remove Book
             printer.output("Enter ISBN of the book you'd like to remove (or -1 to cancel):");
             long isbn = printer.inputLong();
             if (isbn == -1) {
@@ -424,7 +396,7 @@ public class App {
                     printer.output("Book not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 8) { // Add Student
+        } else if (choice == 7) { // Add Student
             printer.output("Enter student's name (or type -1 to cancel):");
             String studentName = printer.input();
             if (studentName.equals("-1")) {
@@ -443,7 +415,7 @@ public class App {
                     }
                 }
             }
-        } else if (choice == 9) { // Remove Student
+        } else if (choice == 8) { // Remove Student
             while (true) {
                 printer.output("Enter student ID of the student you'd like to remove (or -1 to cancel):");
                 int studentId = printer.inputInt();
@@ -460,7 +432,7 @@ public class App {
                     printer.output("Student not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 10) { // View Student Records
+        } else if (choice == 9) { // View Student Records
             while (true) {
                 printer.output("Enter student ID (or -1 to cancel):");
                 int studentId = printer.inputInt();
@@ -494,7 +466,7 @@ public class App {
                     printer.output("Student not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 11) { // Exit
+        } else if (choice == 10) { // Exit
             printer.output("Would you like to save? (Y/N)");
             while (true) {
                 printer.output("Would you like to save? (Y/N or -1 to cancel):");
@@ -512,7 +484,7 @@ public class App {
                     printer.output("Thank you for using The Library®. Goodbye!");
                     System.exit(0);
                 } else if (response.equals("-1")) {
-                    printer.output("Save operation canceled.");
+                    printer.output("Exit operation canceled.");
                     break;
                 } else {
                     printer.output("Invalid input. Please enter Y, N, or -1 to cancel.");
@@ -521,7 +493,7 @@ public class App {
         } else {
             printer.output("Invalid choice. Please try again.");
         }
-        // set timeout for 2 seconds before displaying menu
+        // set timeout for 1.5 seconds before displaying menu
         try {
             Thread.sleep(1500);
             displayMenu();

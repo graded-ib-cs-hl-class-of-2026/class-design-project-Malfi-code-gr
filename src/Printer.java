@@ -1,5 +1,6 @@
 import java.util.Scanner;
 import java.io.*;
+import java.time.format.DateTimeFormatter;
 
 public class Printer {
     private Scanner in = new Scanner(System.in);
@@ -7,16 +8,8 @@ public class Printer {
     private File file;
 
     // ANSI color codes
-    private static final String RESET = "\u001B[0m";
     private static final String WHITE = "\u001B[37m";
-    private static final String BLACK = "\u001B[30m";
-    private static final String RED = "\u001B[31m";
-    private static final String GREEN = "\u001B[32m";
-    private static final String YELLOW = "\u001B[33m";
-    private static final String BLUE = "\u001B[34m";
-    private static final String MAGENTA = "\u001B[35m";
     private static final String CYAN = "\u001B[36m";
-    private static final String LIGHT_BLUE = "\u001B[94m";
 
     /**
      * Opens a given file.
@@ -31,53 +24,56 @@ public class Printer {
         FileWriter writer = new FileWriter(filename);
 
         writer.write("{\n");
-        writer.write("  \"library\": {\n");
+        writer.write("    \"library\": {\n");
 
         // Write the books section
-        writer.write("    \"books\": [\n");
+        writer.write("        \"books\": [\n");
         Book[] books = library.getBooks();
         int bookCount = library.getBookCount();
         for (int i = 0; i < bookCount; i++) {
             Book book = books[i];
-            writer.write("      {\n");
-            writer.write("        \"title\": \"" + book.getTitle() + "\",\n");
-            writer.write("        \"author\": \"" + book.getAuthor() + "\",\n");
-            writer.write("        \"ISBN\": \"" + book.getIsbn() + "\"\n");
-            writer.write("      }" + (i < bookCount - 1 ? "," : "") + "\n");
+            writer.write("            {\n");
+            writer.write("                \"title\": \"" + book.getTitle() + "\",\n");
+            writer.write("                \"author\": \"" + book.getAuthor() + "\",\n");
+            writer.write("                \"ISBN\": \"" + book.getIsbn() + "\"\n");
+            writer.write("            }" + (i < bookCount - 1 ? "," : "") + "\n");
         }
-        writer.write("    ],\n");
+        writer.write("        ],\n");
 
         // Write the students section
-        writer.write("    \"students\": [\n");
+        writer.write("        \"students\": [\n");
         Student[] students = library.getStudents();
         int studentCount = library.getStudentCount();
         for (int i = 0; i < studentCount; i++) {
             Student student = students[i];
-            writer.write("      {\n");
-            writer.write("        \"name\": \"" + student.getName() + "\",\n");
-            writer.write("        \"ID\": " + student.getId() + ",\n");
-            writer.write("        \"checkedOutBooks\": [\n");
+            writer.write("            {\n");
+            writer.write("                \"name\": \"" + student.getName() + "\",\n");
+            writer.write("                \"ID\": " + student.getId() + ",\n");
+            writer.write("                \"checkedOutBooks\": [\n");
 
             // Write each of the student’s checked out books.
             // In the Student class, the checkedOutBooks array is used sequentially so we can stop on the first null.
-            Book[] checkedBooks = student.getCheckedOutBooks();
+            LoanRecord[] checkedBooks = student.getLoanRecords();
             for (int j = 0; j < checkedBooks.length; j++) {
                 if (checkedBooks[j] == null) {
                     break;
                 }
-                writer.write("          {\n");
-                writer.write("            \"title\": \"" + checkedBooks[j].getTitle() + "\",\n");
-                writer.write("            \"checkOutDate\": null,\n");
-                writer.write("            \"dueDate\": null,\n");
-                writer.write("            \"returnedDate\": null\n");
-                writer.write("          }" + ((j < checkedBooks.length - 1 && checkedBooks[j+1] != null) ? "," : "") + "\n");
+                writer.write("                    {\n");
+                writer.write("                        \"title\": \"" + checkedBooks[j].getBook().getTitle() + "\",\n");
+                writer.write("                        \"checkOutDate\": \"" + checkedBooks[j].getCheckOutDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "\",\n");
+                writer.write("                        \"dueDate\": \"" + checkedBooks[j].getDueDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "\",\n");
+                writer.write("                        \"returnedDate\": " + 
+                    (checkedBooks[j].getReturnedDate() != null 
+                        ? "\"" + checkedBooks[j].getReturnedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "\"" 
+                        : "null") + "\n");
+                writer.write("                    }" + ((j < checkedBooks.length - 1 && checkedBooks[j+1] != null) ? "," : "") + "\n");
             }
-            writer.write("        ]\n");
-            writer.write("      }" + (i < studentCount - 1 ? "," : "") + "\n");
+            writer.write("                ]\n");
+            writer.write("            }" + (i < studentCount - 1 ? "," : "") + "\n");
         }
-        writer.write("    ]\n");
+        writer.write("        ]\n");
 
-        writer.write("  }\n");
+        writer.write("    }\n");
         writer.write("}\n");
         writer.close();
     }
