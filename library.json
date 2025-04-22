@@ -29,8 +29,8 @@
                 "checkedOutBooks": [
                     {
                         "title": "To Kill a Mockingbird",
-                        "checkOutDate": "2025-03-07",
-                        "dueDate": "2025-04-07",
+                        "checkOutDate": "2025-04-07",
+                        "dueDate": "2025-05-07",
                         "returnedDate": null
                     },
                     {

@@ -19,7 +19,7 @@ public class LoanRecord {
 
     public LoanRecord(Book book, int loanPeriodDays) {
         this(book, LocalDate.now(), LocalDate.now().plusDays(loanPeriodDays), null);
-    }
+    } 
     
     // getters
     public LocalDate getCheckOutDate() {

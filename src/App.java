@@ -133,8 +133,9 @@ public class App {
         printer.output("│[6] Remove Book                                    │");
         printer.output("│[7] Add Student                                    │");
         printer.output("│[8] Remove Student                                 │");
-        printer.output("│[9] View Student Records                           │");
-        printer.output("│[10] Exit The Library®                             │");
+        printer.output("│[9] Search Student                                 │");
+        printer.output("│[10] View Student Records                          │");
+        printer.output("│[11] Exit The Library®                             │");
         printer.output("╰───────────────────────────────────────────────────╯");
 
         int choice = printer.inputInt();
@@ -206,6 +207,7 @@ public class App {
                 if (isbn != -1 && book != null) {
                     if (book.isCheckedOut()) {
                         book.setCheckedOut(false);
+                        myLibrary.findStudentById(book.getStudentId()).returnBook(book);
                         book.setStudentId(0);
                         printer.output("The book \"" + book.getTitle() + "\" has been returned successfully.");
                     } else {
@@ -432,7 +434,7 @@ public class App {
                     printer.output("Student not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 9) { // View Student Records
+        } else if (choice == 9) { // Search Student
             while (true) {
                 printer.output("Enter student ID (or -1 to cancel):");
                 int studentId = printer.inputInt();
@@ -442,19 +444,41 @@ public class App {
                 }
                 Student student = myLibrary.findStudentById(studentId);
                 if (student != null) {
-                    printer.output("Student ID: " + student.getId() + ", Name: " + student.getName() +
-                    ", Loan Count: " + student.getLoanCount());
+                    printer.output("Student ID: " + WHITE + student.getId() + CYAN + ", Name: " + GREEN + student.getName() +
+                    CYAN + ", Active Loans: " + RED + student.getActiveLoanCount());
+                    break;
+                } else {
+                    printer.output("Student not found. Please try again or type -1 to cancel.");
+                }
+            }
+        } else if (choice == 10) { // View Student Records
+            while (true) {
+                printer.output("Enter student ID (or -1 to cancel):");
+                int studentId = printer.inputInt();
+                if (studentId == -1) {
+                    printer.output("Returning to the main menu.");
+                    break;
+                }
+                Student student = myLibrary.findStudentById(studentId);
+                if (student != null) {
+                    printer.output("Student ID: " + WHITE + student.getId() + CYAN + ", Name: " + GREEN + student.getName() +
+                    CYAN + ", Loan Count: " + RED + student.getLoanCount());
                     for (int j = 0; j < student.getLoanCount(); j++) {
                         LoanRecord record = student.getLoanRecords()[j];
                         if (record != null) {
                             // current time has passed due date (LocalTime)
                             if (record.getDueDate().isBefore(LocalDate.now()) && record.getReturnedDate() == null) {
-                                printer.output(RED + "OVERDUE " + CYAN + "||  \"" + YELLOW + record.getBook().getTitle() + CYAN +
+                                printer.output(RED + "OVERDUE  " + CYAN + "││  \"" + YELLOW + record.getBook().getTitle() + CYAN +
                                 "\", Check Out Date: " + record.getCheckOutDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + CYAN +
                                 ", Due Date: " + WHITE + record.getDueDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + CYAN +
                                 ", Returned Date: " + RED + (record.getReturnedDate() != null ? record.getReturnedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "Not returned"));
+                            } else if (record.getReturnedDate() == null) {
+                                printer.output(LIGHT_BLUE + "ACTIVE" + CYAN + "   ││ \"" + YELLOW + record.getBook().getTitle() + CYAN +
+                                "\", Check Out Date: " + record.getCheckOutDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + CYAN +
+                                ", Due Date: " + WHITE + record.getDueDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + CYAN +
+                                ", Returned Date: " + GREEN + (record.getReturnedDate() != null ? record.getReturnedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "Not returned"));
                             } else {
-                                printer.output("\"" + YELLOW + record.getBook().getTitle() + CYAN +
+                                printer.output(GREEN + "RETURNED " + CYAN + "││ \"" + YELLOW + record.getBook().getTitle() + CYAN +
                                 "\", Check Out Date: " + record.getCheckOutDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + CYAN +
                                 ", Due Date: " + WHITE + record.getDueDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + CYAN +
                                 ", Returned Date: " + GREEN + (record.getReturnedDate() != null ? record.getReturnedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : "Not returned"));
@@ -466,7 +490,7 @@ public class App {
                     printer.output("Student not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 10) { // Exit
+        } else if (choice == 11) { // Exit
             printer.output("Would you like to save? (Y/N)");
             while (true) {
                 printer.output("Would you like to save? (Y/N or -1 to cancel):");

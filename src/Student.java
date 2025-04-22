@@ -1,4 +1,6 @@
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class Student {
     private String name;
@@ -6,6 +8,7 @@ public class Student {
     
     private LoanRecord[] loanRecords = new LoanRecord[100];
     private int loanRecordCount = 0;
+    private int activeLoanCount = 0;
 
     public Student(String name, int id) {
         this.name = name;
@@ -19,8 +22,19 @@ public class Student {
      */
     public void borrowBook(Book book, int loanPeriodDays) {
         if (loanRecordCount < loanRecords.length) {
-            loanRecords[loanRecordCount++] = 
-                new LoanRecord(book, loanPeriodDays);
+            loanRecords[loanRecordCount++] = new LoanRecord(book, loanPeriodDays);
+            activeLoanCount++;
+            sortLoanRecords();
+        }
+    }
+
+    public void returnBook(Book book) {
+        activeLoanCount--;
+        for (int i = 0; i < loanRecordCount; i++) {
+            if (loanRecords[i].getBook().equals(book)) {
+                loanRecords[i].setReturnedDate(LocalDate.now());
+                break;
+            }
         }
     }
 
@@ -32,8 +46,11 @@ public class Student {
                               LocalDate due,
                               LocalDate returned) {
         if (loanRecordCount < loanRecords.length) {
-            loanRecords[loanRecordCount++] = 
-                new LoanRecord(book, checkOut, due, returned);
+            loanRecords[loanRecordCount++] = new LoanRecord(book, checkOut, due, returned);
+            sortLoanRecords();
+            if (returned == null) {
+                activeLoanCount++;
+            }
         }
     }
 
@@ -66,6 +83,15 @@ public class Student {
         return results;
     }
 
+    /** 
+     * After every insertion, keep loanRecords[0..loanRecordCount) sorted by checkOutDate 
+     */
+    // Learned from https://www.geeksforgeeks.org/arrays-sort-in-java/ and https://www.baeldung.com/java-8-comparator-comparing
+    private void sortLoanRecords() { 
+        Arrays.sort(loanRecords, 0, loanRecordCount,
+            Comparator.comparing(LoanRecord::getCheckOutDate).reversed());
+    }
+
     // Getters
     public String getName() {
         return name;
@@ -77,6 +103,10 @@ public class Student {
 
     public int getLoanCount() {
         return loanRecordCount;
+    }
+
+    public int getActiveLoanCount() {
+        return activeLoanCount;
     }
 
     // Setters
