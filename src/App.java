@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 
 
 public class App {
@@ -67,7 +66,6 @@ public class App {
             while (studentMatcher.find()) {
                 String studentName = studentMatcher.group(1);
                 int studentId = Integer.parseInt(studentMatcher.group(2));
-                String checkedOutBooksContent = studentMatcher.group(3);
 
                 library.addStudent(studentName, studentId);
                 Student student = library.findStudentById(studentId);
@@ -131,11 +129,12 @@ public class App {
         printer.output("│[4] List All Books                                 │");
         printer.output("│[5] Add Book                                       │");
         printer.output("│[6] Remove Book                                    │");
-        printer.output("│[7] Add Student                                    │");
-        printer.output("│[8] Remove Student                                 │");
-        printer.output("│[9] Search Student                                 │");
-        printer.output("│[10] View Student Records                          │");
-        printer.output("│[11] Exit The Library®                             │");
+        printer.output("│[7] Mark Book Lost                                 │");
+        printer.output("│[8] Add Student                                    │");
+        printer.output("│[9] Remove Student                                 │");
+        printer.output("│[10] Search Student                                │");
+        printer.output("│[11] View Student Records                          │");
+        printer.output("│[12] Exit The Library®                             │");
         printer.output("╰───────────────────────────────────────────────────╯");
 
         int choice = printer.inputInt();
@@ -398,7 +397,24 @@ public class App {
                     printer.output("Book not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 7) { // Add Student
+        } else if (choice == 7) { // Mark Lost
+            while (true) {
+                printer.output("Enter ISBN of the book you'd like to mark as lost (or -1 to cancel):");
+                long isbn = printer.inputLong();
+                if (isbn == -1) {
+                    printer.output("Returning to the main menu.");
+                    break;
+                }
+                Book book = myLibrary.findBookByIsbn(isbn);
+                if (book != null) {
+                    book.setLost(true);
+                    printer.output("The book \"" + book.getTitle() + "\" has been marked as lost.");
+                    break;
+                } else {
+                    printer.output("Book not found. Please try again or type -1 to cancel.");
+                }
+            }
+        } else if (choice == 8) { // Add Student
             printer.output("Enter student's name (or type -1 to cancel):");
             String studentName = printer.input();
             if (studentName.equals("-1")) {
@@ -417,7 +433,7 @@ public class App {
                     }
                 }
             }
-        } else if (choice == 8) { // Remove Student
+        } else if (choice == 9) { // Remove Student
             while (true) {
                 printer.output("Enter student ID of the student you'd like to remove (or -1 to cancel):");
                 int studentId = printer.inputInt();
@@ -434,24 +450,57 @@ public class App {
                     printer.output("Student not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 9) { // Search Student
+        } else if (choice == 10) { // Search Student
             while (true) {
-                printer.output("Enter student ID (or -1 to cancel):");
-                int studentId = printer.inputInt();
-                if (studentId == -1) {
+                printer.output("Search student by: [1] ID, [2] Name (or -1 to cancel):");
+                int searchType = printer.inputInt();
+                if (searchType == -1) {
                     printer.output("Returning to the main menu.");
                     break;
                 }
-                Student student = myLibrary.findStudentById(studentId);
-                if (student != null) {
-                    printer.output("Student ID: " + WHITE + student.getId() + CYAN + ", Name: " + GREEN + student.getName() +
-                    CYAN + ", Active Loans: " + RED + student.getActiveLoanCount());
+                if (searchType == 1) { // ID
+                    while (true) {
+                        printer.output("Enter student ID (or -1 to cancel):");
+                        int studentId = printer.inputInt();
+                        if (studentId == -1) {
+                            printer.output("Returning to the main menu.");
+                            break;
+                        }
+                        Student student = myLibrary.findStudentById(studentId);
+                        if (student != null) {
+                            printer.output("Student ID: " + WHITE + student.getId() +
+                                           CYAN + ", Name: " + GREEN + student.getName() +
+                                           CYAN + ", Active Loans: " + RED + student.getActiveLoanCount());
+                            break;
+                        } else {
+                            printer.output("Student not found. Please try again or type -1 to cancel.");
+                        }
+                    }
                     break;
-                } else {
-                    printer.output("Student not found. Please try again or type -1 to cancel.");
                 }
+                if (searchType == 2) { // Name
+                    while (true) {
+                        printer.output("Enter student name (or type -1 to cancel):");
+                        String studentName = printer.input();
+                        if (studentName.equals("-1")) {
+                            printer.output("Returning to the main menu.");
+                            break;
+                        }
+                        Student student = myLibrary.findStudentByName(studentName);
+                        if (student != null) {
+                            printer.output("Student ID: " + WHITE + student.getId() +
+                                           CYAN + ", Name: " + GREEN + student.getName() +
+                                           CYAN + ", Active Loans: " + RED + student.getActiveLoanCount());
+                            break;
+                        } else {
+                            printer.output("Student not found. Please try again or type -1 to cancel.");
+                        }
+                    }
+                    break;
+                }
+                printer.output("Invalid input. Please enter 1, 2, or -1 to cancel.");
             }
-        } else if (choice == 10) { // View Student Records
+        } else if (choice == 11) { // View Student Records
             while (true) {
                 printer.output("Enter student ID (or -1 to cancel):");
                 int studentId = printer.inputInt();
@@ -490,8 +539,7 @@ public class App {
                     printer.output("Student not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 11) { // Exit
-            printer.output("Would you like to save? (Y/N)");
+        } else if (choice == 12) { // Exit
             while (true) {
                 printer.output("Would you like to save? (Y/N or -1 to cancel):");
                 String response = printer.input();
@@ -499,6 +547,7 @@ public class App {
                     try {
                         printer.saveFile("library.json", myLibrary);
                         printer.output("Library data saved successfully.");
+                        System.exit(0);
                     } catch (IOException e) {
                         printer.output("Error saving library data: " + e.getMessage());
                     }

@@ -34,16 +34,16 @@
                         "returnedDate": null
                     },
                     {
-                        "title": "1984",
-                        "checkOutDate": "2025-02-28",
-                        "dueDate": "2025-03-28",
-                        "returnedDate": "2025-03-29"
-                    },
-                    {
                         "title": "The Great Gatsby",
                         "checkOutDate": "2025-03-01",
                         "dueDate": "2025-03-31",
                         "returnedDate": null
+                    },
+                    {
+                        "title": "1984",
+                        "checkOutDate": "2025-02-28",
+                        "dueDate": "2025-03-28",
+                        "returnedDate": "2025-03-29"
                     }
                 ]
             },
@@ -52,16 +52,16 @@
                 "ID": 321789,
                 "checkedOutBooks": [
                     {
-                        "title": "1984",
-                        "checkOutDate": "2025-01-05",
-                        "dueDate": "2025-02-05",
-                        "returnedDate": "2025-02-05"
-                    },
-                    {
                         "title": "The Great Gatsby",
                         "checkOutDate": "2025-01-10",
                         "dueDate": "2025-02-10",
                         "returnedDate": "2025-02-10"
+                    },
+                    {
+                        "title": "1984",
+                        "checkOutDate": "2025-01-05",
+                        "dueDate": "2025-02-05",
+                        "returnedDate": "2025-02-05"
                     }
                 ]
             }

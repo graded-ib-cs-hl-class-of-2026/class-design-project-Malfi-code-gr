@@ -1,6 +1,5 @@
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Scanner;
 
 public class Library {
     private Book[] books = new Book[100];
@@ -105,6 +104,15 @@ public class Library {
     public Student findStudentById(int id) {
         for (int i = 0; i < studentCount; i++) {
             if (students[i].getId() == id) {
+                return students[i];
+            }
+        }
+        return null;
+    }
+
+    public Student findStudentByName(String name) {
+        for (int i = 0; i < studentCount; i++) {
+            if (students[i].getName().equalsIgnoreCase(name)) {
                 return students[i];
             }
         }
