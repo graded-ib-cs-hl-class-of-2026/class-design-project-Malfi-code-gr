@@ -6,21 +6,6 @@ public class Book {
     private boolean isLost;
     private double stacksLocation;
     private int studentId;
-    private String dueDate;
-
-    // private String dueDate;
-    
-    // ANSI color codes
-    private static final String RESET = "\u001B[0m";
-    private static final String WHITE = "\u001B[37m";
-    private static final String BLACK = "\u001B[30m";
-    private static final String RED = "\u001B[31m";
-    private static final String GREEN = "\u001B[32m";
-    private static final String YELLOW = "\u001B[33m";
-    private static final String BLUE = "\u001B[34m";
-    private static final String MAGENTA = "\u001B[35m";
-    private static final String CYAN = "\u001B[36m";
-    private static final String LIGHT_BLUE = "\u001B[94m";
     
     /**
      * Constructor to initialize a Book object.
