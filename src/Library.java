@@ -9,6 +9,12 @@ public class Library {
 
     private static final String CYAN = "\u001B[36m";
 
+    /**
+     * Adds a new book to the library itself. (Book array)
+     * @param title
+     * @param author
+     * @param isbn
+     */
     public void addBook(String title, String author, long isbn) {
         if (bookCount < books.length) {
             books[bookCount++] = new Book(title, author, isbn);
@@ -17,6 +23,10 @@ public class Library {
         }
     }
 
+    /**
+     * Removes a book from the library.
+     * @param isbn
+     */
     public void removeBook(long isbn) {
         for (int i = 0; i < bookCount; i++) {
             if (books[i].getIsbn() == isbn) {
@@ -28,6 +38,10 @@ public class Library {
         System.out.println("Book not found.");
     }
 
+    /**
+     * Finds a book by its ISBN number.
+     * @param isbn
+     */
     public Book findBookByIsbn(long isbn) {
         for (int i = 0; i < bookCount; i++) {
             if (books[i].getIsbn() == isbn) {
@@ -37,6 +51,10 @@ public class Library {
         return null;
     }
 
+    /**
+     * Finds a book by its title.
+     * @param title
+     */
     public Book findBookByTitle(String title) {
         for (int i = 0; i < bookCount; i++) {
             if (books[i].getTitle().equalsIgnoreCase(title)) {
@@ -46,9 +64,10 @@ public class Library {
         return null;
     }    
     
-
     /**
      * Checks out a book for a student with the default number of days (14).
+     * @param studentId
+     * @param isbn
      */
     public void checkOutBook(int studentId, long isbn) {
         Book book = findBookByIsbn(isbn);
@@ -68,6 +87,9 @@ public class Library {
 
     /**
      * Checks out a book for a specified number of days.
+     * @param studentId
+     * @param isbn
+     * @param days
      */
     public void checkOutBook(int studentId, long isbn, int days) {
         Book book = findBookByIsbn(isbn);
@@ -82,6 +104,11 @@ public class Library {
         }
     }
 
+    /**
+     * Adds a student to the library.
+     * @param name
+     * @param id
+     */
     public void addStudent(String name, int id) {
         if (studentCount < students.length) {
             students[studentCount++] = new Student(name, id);
@@ -90,6 +117,10 @@ public class Library {
         }
     }
 
+    /**
+     * Removes a student from the library.
+     * @param id
+     */
     public void removeStudent(int id) {
         for (int i = 0; i < studentCount; i++) {
             if (students[i].getId() == id) {
@@ -101,6 +132,11 @@ public class Library {
         System.out.println("Student not found.");
     }
 
+    /**
+     * Finds a student by their ID.
+     * @param id
+     * @return
+     */
     public Student findStudentById(int id) {
         for (int i = 0; i < studentCount; i++) {
             if (students[i].getId() == id) {
@@ -110,6 +146,11 @@ public class Library {
         return null;
     }
 
+    /**
+     * Finds a student by their name.
+     * @param name
+     * @return
+     */
     public Student findStudentByName(String name) {
         for (int i = 0; i < studentCount; i++) {
             if (students[i].getName().equalsIgnoreCase(name)) {

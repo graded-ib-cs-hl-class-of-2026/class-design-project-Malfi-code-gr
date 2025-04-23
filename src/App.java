@@ -24,6 +24,11 @@ public class App {
         displayMenu();
     }
 
+    /**
+     * Reads the library data from a JSON file and populates the Library object (books and students array).
+     * @param filename
+     * @return
+     */
     public Library readLibraryData(String filename) {
         Library library = new Library();
     
@@ -71,7 +76,8 @@ public class App {
                 Student student = library.findStudentById(studentId);
                 String booksBlock = studentMatcher.group(3);
 
-                // captures title, checkout, due, returned (or null)
+                // A bit more complicated but same logic...
+                // Looks for title, checkout, due, returned (or null)
                 Pattern recordPattern = Pattern.compile(
                     "\\{\\s*\"title\"\\s*:\\s*\"([^\"]+)\"\\s*," +
                     "\\s*\"checkOutDate\"\\s*:\\s*\"(\\d{4}-\\d{2}-\\d{2})\"\\s*," +
@@ -81,16 +87,17 @@ public class App {
                     Pattern.DOTALL
                 );
 
+                // The matcher will look for the pattern in the string and return the first match it finds.
                 Matcher recM = recordPattern.matcher(booksBlock);
                 while (recM.find()) {
-                    String title = recM.group(1);
-                    LocalDate checkout = LocalDate.parse(recM.group(2));
-                    LocalDate due = LocalDate.parse(recM.group(3));
-                    String retString = recM.group(4);
+                    String title = recM.group(1); // Book title
+                    LocalDate checkout = LocalDate.parse(recM.group(2)); // checkout date
+                    LocalDate due = LocalDate.parse(recM.group(3)); // due date
+                    String retString = recM.group(4); // returned date
                 
                     LocalDate returned;
                     if (retString != null) {
-                        returned = LocalDate.parse(retString);
+                        returned = LocalDate.parse(retString); // convert from string to LocalDate
                     } else {
                         returned = null;
                     }
@@ -111,6 +118,9 @@ public class App {
         return library;
     }    
 
+    /**
+     * Displays the title of the program in a cool way. I separated this out so I can reuse the menu without displaying the title in the future.
+     */
     public void displayTitle() { 
         printer.output("\n" +
                         "████████╗██╗░░██╗███████╗  ██╗░░░░░██╗██████╗░██████╗░░█████╗░██████╗░██╗░░░██╗\n"+
@@ -121,6 +131,10 @@ public class App {
                         "░░░╚═╝░░░╚═╝░░╚═╝╚══════╝  ╚══════╝╚═╝╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░");
     }
 
+    /**
+     * Displays the main menu.
+     * Most of its functionality is handling user input and calling the appropriate methods in the Library class.
+     */
     public void displayMenu() {
         printer.output("\n╭───────────────────────────────────────────────────╮");
         printer.output("│[1] Check Out Book                                 │");
@@ -397,7 +411,7 @@ public class App {
                     printer.output("Book not found. Please try again or type -1 to cancel.");
                 }
             }
-        } else if (choice == 7) { // Mark Lost
+        } else if (choice == 7) { // Mark Book Lost
             while (true) {
                 printer.output("Enter ISBN of the book you'd like to mark as lost (or -1 to cancel):");
                 long isbn = printer.inputLong();
@@ -543,7 +557,7 @@ public class App {
             while (true) {
                 printer.output("Would you like to save? (Y/N or -1 to cancel):");
                 String response = printer.input();
-                if (response.equalsIgnoreCase("Y")) {
+                if (response.equalsIgnoreCase("Y")) { // Save
                     try {
                         printer.saveFile("library.json", myLibrary);
                         printer.output("Library data saved successfully.");
@@ -552,7 +566,7 @@ public class App {
                         printer.output("Error saving library data: " + e.getMessage());
                     }
                     break;
-                } else if (response.equalsIgnoreCase("N")) {
+                } else if (response.equalsIgnoreCase("N")) { // Don't save
                     printer.output("Library data not saved.");
                     printer.output("Thank you for using The Library®. Goodbye!");
                     System.exit(0);

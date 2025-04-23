@@ -10,6 +10,13 @@ public class LoanRecord {
     private LocalDate dueDate;
     private LocalDate returnedDate; // remains null until the book is returned
 
+    /**
+     * Constructor to initialize a LoanRecord object. Stores the details for one checkout event.
+     * @param book
+     * @param checkOutDate
+     * @param dueDate
+     * @param returnedDate
+     */
     public LoanRecord(Book book, LocalDate checkOutDate, LocalDate dueDate, LocalDate returnedDate) {
         this.book = book;
         this.checkOutDate = checkOutDate;
@@ -17,6 +24,11 @@ public class LoanRecord {
         this.returnedDate = returnedDate;
     }
 
+    /**
+     * Constructor to initialize a LoanRecord object with a specified loan period. Used for live checkouts.
+     * @param book
+     * @param loanPeriodDays
+     */
     public LoanRecord(Book book, int loanPeriodDays) {
         this(book, LocalDate.now(), LocalDate.now().plusDays(loanPeriodDays), null);
     } 

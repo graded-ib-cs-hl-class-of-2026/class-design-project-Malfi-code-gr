@@ -10,6 +10,11 @@ public class Student {
     private int loanRecordCount = 0;
     private int activeLoanCount = 0;
 
+    /**
+     * Constructor to initialize a Student object.
+     * @param name
+     * @param id
+     */
     public Student(String name, int id) {
         this.name = name;
         this.id = id;
@@ -28,6 +33,10 @@ public class Student {
         }
     }
 
+    /**
+     * Returns a book to the library.
+     * @param book
+     */
     public void returnBook(Book book) {
         activeLoanCount--;
         for (int i = 0; i < loanRecordCount; i++) {
@@ -39,7 +48,7 @@ public class Student {
     }
 
     /** 
-     * Load a historical record from JSON 
+     * Load a historical loan record from JSON 
      */
     public void addLoanRecord(Book book,
                               LocalDate checkOut,
@@ -55,7 +64,7 @@ public class Student {
     }
 
     /**
-     * Returns an array containing only the active loan records.
+     * Returns an array containing all loan records.
      */
     public LoanRecord[] getLoanRecords() {
         LoanRecord[] out = new LoanRecord[loanRecordCount];
