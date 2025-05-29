@@ -28,10 +28,9 @@ public class Printer {
 
         // Write the books section
         writer.write("        \"books\": [\n");
-        Book[] books = library.getBooks();
         int bookCount = library.getBookCount();
         for (int i = 0; i < bookCount; i++) {
-            Book book = books[i];
+            Book book = library.getBook(i);
             writer.write("            {\n");
             writer.write("                \"title\": \"" + book.getTitle() + "\",\n");
             writer.write("                \"author\": \"" + book.getAuthor() + "\",\n");

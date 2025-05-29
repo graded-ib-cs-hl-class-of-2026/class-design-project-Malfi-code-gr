@@ -161,8 +161,8 @@ public class Library {
     }
 
     // getters
-    public Book[] getBooks() {
-        return books;
+    public Book getBook(int i) {
+        return books[i];
     }
 
     public int getBookCount() {

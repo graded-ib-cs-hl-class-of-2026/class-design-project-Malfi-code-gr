@@ -339,7 +339,7 @@ public class App {
         // List All Books
         printer.output("List of all books in the library:\n-=-=-=-=-=-=-=-=-=-=-=-=-");
         for (int i = 0; i < myLibrary.getBookCount(); i++) {
-            Book book = myLibrary.getBooks()[i];
+            Book book = myLibrary.getBook(i);
             if (book.isCheckedOut()) {
                 printer.output("Title: " + RED + book.getTitle() + 
                 CYAN + ", Author: " + LIGHT_BLUE + book.getAuthor() +
@@ -412,7 +412,7 @@ public class App {
                 }
                 boolean exists = false;
                 for (int i = 0; i < myLibrary.getBookCount(); i++) {
-                    if (myLibrary.getBooks()[i].getIsbn() == bookIsbn) {
+                    if (myLibrary.getBook(i).getIsbn() == bookIsbn) {
                         exists = true;
                         break;
                     }

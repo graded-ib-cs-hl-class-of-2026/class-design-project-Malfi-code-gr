@@ -4,7 +4,6 @@ public class Book {
     private long isbn;
     private boolean isCheckedOut;
     private boolean isLost;
-    private double stacksLocation;
     private int studentId;
     
     /**
@@ -36,10 +35,6 @@ public class Book {
         return isLost;
     }
 
-    public double getStacksLocation() {
-        return stacksLocation;
-    }
-
     public int getStudentId() {
         return studentId;
     }
@@ -64,11 +59,7 @@ public class Book {
     public void setLost(boolean isLost) {
         this.isLost = isLost;
     }
-
-    public void setStacksLocation(double stacksLocation) {
-        this.stacksLocation = stacksLocation;
-    }
-
+    
     public void setStudentId(int studentId) {
         this.studentId = studentId;
     }
